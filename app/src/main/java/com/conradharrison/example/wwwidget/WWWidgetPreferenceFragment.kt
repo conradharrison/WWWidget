@@ -6,7 +6,7 @@ import androidx.preference.PreferenceFragmentCompat
 class WWWidgetPreferenceFragment : PreferenceFragmentCompat() {
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(
-            R.xml.wwwidget_settings
+            R.xml.widget_settings
             , rootKey
         )
     }
