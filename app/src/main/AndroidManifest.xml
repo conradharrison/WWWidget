@@ -25,8 +25,8 @@
 
         <receiver
             android:name=".WWWidgetProvider"
-            android:label="WW Widget"
-            android:configure=".WWWidgetConfigure">
+            android:label="WW Widget">
+<!--            android:configure=".WWWidgetConfigure">-->
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>

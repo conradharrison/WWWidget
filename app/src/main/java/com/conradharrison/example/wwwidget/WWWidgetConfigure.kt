@@ -5,46 +5,49 @@ import android.app.PendingIntent
 import android.appwidget.AppWidgetManager
 import android.content.Intent
 import android.os.Bundle
-import android.widget.RemoteViews
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
-
-import kotlinx.android.synthetic.main.activity_widget_configure.*
-import java.text.SimpleDateFormat
-import java.util.*
+import android.view.View
+import android.widget.RemoteViews
 
 class WWWidgetConfigure : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        Log.i("WWWidgetConfigure/onCreate", "Called")
+
+        // setup a RESULT_CANCELED result, in case this config activity is prematurely closed
+        setResult(RESULT_CANCELED)
+
         // Expand Preference Fragment in to the Configure Activity
         supportFragmentManager
             .beginTransaction()
-            .add(R.id.config_view, WWWidgetPreferenceFragment())
+            .add(R.id.config_view_pref_container, WWWidgetPreferenceFragment())
             .commit()
-
         setContentView(R.layout.activity_widget_configure)
+    }
 
-        // TODO Configure; default=read_from_store; Finally, write to store
+    fun closeSettings(v: View) {
+        Log.i("WWWidgetConfigure/closeSettings", "Called")
 
-        val appWidgetId = Intent().extras?.getInt(
+        val appWidgetId = getIntent().extras?.getInt(
             AppWidgetManager.EXTRA_APPWIDGET_ID,
             AppWidgetManager.INVALID_APPWIDGET_ID
         ) ?: AppWidgetManager.INVALID_APPWIDGET_ID
 
-        val context = applicationContext
-        val views = RemoteViews(context.packageName, R.layout.widget_layout)
+        // TODO Configure; default=read_from_store; Finally, write to store
 
-        // Register callback for widget configuration
-        val intent = Intent()
-        val pendingIntent = PendingIntent.getActivity(context, 0, intent, 0)
-        views.setOnClickPendingIntent(R.id.wwtext, pendingIntent)
-
-        // One-time update to widget
-        views.setTextViewText(R.id.wwtext, SimpleDateFormat("hh:mm:ss", Locale.getDefault()).format(Date()))
-
-        val appWidgetManager: AppWidgetManager = AppWidgetManager.getInstance(context)
-        appWidgetManager.updateAppWidget(appWidgetId, views)
+        val appWidgetManager: AppWidgetManager = AppWidgetManager.getInstance(this)
+        val pendingIntent: PendingIntent = Intent(this, WWWidgetConfigure::class.java)
+            .let { intent ->
+                PendingIntent.getActivity(this, 0, intent, 0)
+            }
+        RemoteViews(this.packageName, R.layout.widget_layout).also { views->
+            views.setOnClickPendingIntent(R.id.wwtext, pendingIntent)
+            updateWWContent(views)
+            appWidgetManager.updateAppWidget(appWidgetId, views)
+        }
 
         val resultValue = Intent().apply {
             putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
